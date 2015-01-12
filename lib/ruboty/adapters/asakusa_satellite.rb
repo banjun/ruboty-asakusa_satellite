@@ -2,6 +2,9 @@ require 'json'
 require 'open-uri'
 require 'socket.io-client-simple'
 
+require 'httparty'
+HTTParty::Basement.default_options.update(verify: false)
+
 module Ruboty
   module Adapters
     class AsakusaSatellite < Base
@@ -33,7 +36,7 @@ module Ruboty
       private
 
       def client
-        info = JSON.parse(open("#{url}/api/v1/service/info.json").read)
+        info = JSON.parse(open("#{url}/api/v1/service/info.json", :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE).read)
         url = info["message_pusher"]["param"]["url"]
         key = info["message_pusher"]["param"]["key"]
         @client ||= SocketIO::Client::Simple::Client.new(url, app: key)
